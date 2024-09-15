@@ -19,6 +19,13 @@ def handle_datetime(df):
 
 def kill_duplicates(df):
     df_new = df.drop_duplicates()
+    
+    try:
+        df_new = handle_datetime(df_new)
+        
+    except:
+        pass
+    
     return df_new
 
 def main(dataset: list):
@@ -28,11 +35,6 @@ def main(dataset: list):
         # df.info()
         
         df = kill_duplicates(df)
-        
-        try:
-            if df['date']:
-                df = handle_datetime(df)
-            
-        except:
-            pass
+        # gg
+
 

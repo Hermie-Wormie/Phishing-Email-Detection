@@ -15,3 +15,10 @@ def extract_data():
 def main():
     
     clean_data(extract_data())
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nExiting programme ...")
+        exit()

@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from DATAMANIPULATION.data_clean import *
+from DATAMANIPULATION.data_clean import main as clean_data
 
 def extract_data():
     data_path = Path("DATASET")
@@ -12,4 +12,6 @@ def extract_data():
     # for path in data_path
     return datasets
 
-datainfo(extract_data())
+def main():
+    
+    clean_data(extract_data())

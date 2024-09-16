@@ -1,15 +1,23 @@
 import os
+import shutil
 from pathlib import Path
 from DATAMANIPULATION.data_clean import main as clean_data
 
 def extract_data():
-    data_path = Path("DATASET")
+    dataset_dir = Path("DATASET")
+    cleandata_dir = Path("CLEANDATA")
     
     ext = "*.csv"
     datasets: list[Path] = []
-    datasets.extend(data_path.glob(ext))
+    datasets.extend(dataset_dir.glob(ext))
 
-    # for path in data_path
+    status = cleandata_dir.exists()
+    if status:
+        # print(f"Removing existing {cleandata_dir} ... ", end="")
+        shutil.rmtree(cleandata_dir)
+    # print(f"Making {cleandata_dir} ... ", end="")
+    cleandata_dir.mkdir()
+
     return datasets
 
 def main():

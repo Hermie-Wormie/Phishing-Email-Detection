@@ -18,12 +18,41 @@ from nltk.corpus import stopwords
 from nltk.corpus import wordnet
 from nltk.stem.wordnet import WordNetLemmatizer
 
-download('punkt', quiet=True)
+download('punkt_tab', quiet=True)
 download('stopwords', quiet=True)
 # download('averaged_perceptron_tagger', quiet=True)
 # download('wordnet', quiet=True)
 # download('omw-1.4', quiet=True)
 
+def extract_sender(senders):
+    try:
+        senders.drop(columns=['subject','body','urls'],inplace=True)
+        senders.to_csv(r'..\CLEANDATA\senders.csv')
+    except Exception as e:
+        pass
+
+def extract_subject(subjects):
+    try:
+        subjects.drop(columns=['subject','body','urls'],inplace=True)
+        subjects.to_csv(r'..\CLEANDATA\subjects.csv')
+    except Exception as e:
+        pass
+
+def replace_urls(kms):
+        
+    try:
+
+        urls = re.findall(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', kms)
+        
+        with open('../CLEANDATA/urls.csv','a') as f:
+            for url in urls:
+                f.write(url)
+        
+        kms = re.sub(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', '', kms)
+    except Exception as e:
+        pass
+    
+    return kms
 
 def tokenize(input_text):
     """
@@ -44,18 +73,6 @@ def remove_stopwords(tokenized_text):
     
     return clean_list
 
-def handle_datetime(df):
-    df['date'] = to_datetime(df['date'], format='%a, %d %b %Y %H:%M:%S %z', errors='coerce', utc=True)
-            
-    # Creating separate columns for Date and Time
-    df['Date'] = df['date'].dt.date
-    df['Time'] = df['date'].dt.time
-
-    # Handling any remaining NaT values (if any)
-    df = df.dropna(subset=['date'])
-    
-    return df
-
 def kill_duplicates(df):
     df_new = df.drop_duplicates()
     
@@ -64,16 +81,25 @@ def kill_duplicates(df):
 def main(dataset: list):
 
     for data in dataset:
-        df = read_csv(data)
+        df = read_csv(data,index_col=0)
         # df.info()
         
         df = kill_duplicates(df)
 
         try:
+            # for csvs with "receiver" and "date" columns
             df.drop(columns=['receiver','date'],inplace=True)
-            df = handle_datetime(df)
-            
+                        
         except Exception as e:
-            continue
+            pass
+
+        try:
+
+            df['body'] = df['body'].apply(replace_urls)
+
+            df.head(10)
+        
+        except Exception as e:
+            pass
 
 

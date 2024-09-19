@@ -27,36 +27,46 @@ download('stopwords', quiet=True)
 def extract_sender(senders):
     try:
         senders.drop(columns=['subject','body','urls'],inplace=True)
-        senders.to_csv(r'..\CLEANDATA\senders.csv')
+        senders.dropna()
+        senders.drop_duplicates()
+        senders.to_csv(r'CLEANDATA\senders.csv',index=False)
     except Exception as e:
         pass
 
 def extract_subject(subjects):
     try:
         subjects.drop(columns=['sender','body','urls'],inplace=True)
-        subjects.to_csv(r'..\CLEANDATA\subjects.csv')
+    except KeyError:
+        subjects.drop(columns=['body'],inplace=True)
     except Exception as e:
-        try:
-            subjects.drop(columns=['body'],inplace=True)
-            subjects.to_csv(r'..\CLEANDATA\subjects.csv')
-        except Exception as e:
-            pass
+        pass
+    finally:
+        subjects.dropna()
+        subjects.drop_duplicates()
+        subjects.to_csv(r'CLEANDATA\subjects.csv',index=False)
 
 def extract_body(words):
     try:
-        words.drop(columns=['urls'],inplace=True)
-        words.to_csv(r'..\CLEANDATA\body.csv')
+        words.drop(columns=['url'],inplace=True)
+    except KeyError:
+        pass
     except Exception as e:
         pass
+    finally:
+        words.dropna()
+        words.drop_duplicates()
+        words.to_csv(r'CLEANDATA\body.csv',index=False)
 
 def extract_urls(url):
     try:
         url.drop(columns=['body'],inplace=True)
-        url.to_csv(r'..\CLEANDATA\urls.csv')
+        url.dropna()
+        url.to_csv(r'CLEANDATA\urls.csv',index=False)
     except Exception as e:
         pass
 
 def replace_urls(body):
+    url_dict = {}
     
     try:
 
@@ -66,17 +76,50 @@ def replace_urls(body):
 
         body.drop(columns=['subject'],inplace=True)
 
-        urls = re.findall(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', body['body'])
-
-        if urls != []: 
-            body['url'] = urls
-            body['body'] = re.sub(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', '', body['body'])
-            extract_urls(body)
-        
-        extract_body(body)
-
     except Exception as e:
         pass
+
+    try:
+        for i in range(body.shape[0]):
+
+            urls = re.findall(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', body.values[i][0])
+
+            if urls != []: 
+                
+                url_dict.update({i:urls})
+                body.loc[i,"body"] = re.sub(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', '', body.loc[i,"body"])
+            
+            else: url_dict.update({i:''})
+
+            # will be editing soon
+            tokens = body.copy()
+            body.loc[i,"body"] = sanitize_whitespace(body.loc[i,"body"])
+        
+        if url_dict != {}:
+            body['url'] = body.index.map(url_dict)
+            extract_urls(body.copy())
+        
+        extract_body(body.copy())
+    
+    except Exception as e:
+        pass
+
+def sanitize_whitespace(input_string):
+    """
+    Remove extra whitespace
+    """
+    lines = input_string.split('\n')
+    for index, line  in enumerate(lines):
+        if line=='.':
+            lines.remove(line)
+            for i in range(1, len(lines)): # check for lines that contain text
+                if (lines[index-i] != ''):
+                    lines[index-i] += '.'
+                    break
+                    
+    output_string = '\n'.join(lines)
+    
+    return output_string.strip()
 
 def tokenize(input_text):
     """
@@ -105,7 +148,7 @@ def kill_duplicates(df):
 def main(dataset: list):
 
     for data in dataset:
-        df = read_csv(data,index_col=0)
+        df = read_csv(data)
         # df.info()
         
         df = kill_duplicates(df)
@@ -120,7 +163,9 @@ def main(dataset: list):
         try:
 
             # extract_subject(df)
-            extract_urls(df)
+            replace_urls(df.copy())
+            extract_sender(df.copy())
+            extract_subject(df.copy())
 
             df.head(10)
         

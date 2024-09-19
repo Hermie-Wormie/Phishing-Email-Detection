@@ -33,24 +33,50 @@ def extract_sender(senders):
 
 def extract_subject(subjects):
     try:
-        subjects.drop(columns=['subject','body','urls'],inplace=True)
+        subjects.drop(columns=['sender','body','urls'],inplace=True)
         subjects.to_csv(r'..\CLEANDATA\subjects.csv')
+    except Exception as e:
+        try:
+            subjects.drop(columns=['body'],inplace=True)
+            subjects.to_csv(r'..\CLEANDATA\subjects.csv')
+        except Exception as e:
+            pass
+
+def extract_body(words):
+    try:
+        words.drop(columns=['urls'],inplace=True)
+        words.to_csv(r'..\CLEANDATA\body.csv')
     except Exception as e:
         pass
 
-def extract_urls(body):
-        
+def extract_urls(url):
     try:
+        url.drop(columns=['body'],inplace=True)
+        url.to_csv(r'..\CLEANDATA\urls.csv')
+    except Exception as e:
+        pass
+
+def replace_urls(body):
+    
+    try:
+
+        body.drop(columns=['sender','subject','urls'],inplace=True)
+    
+    except KeyError:
+
+        body.drop(columns=['subject'],inplace=True)
 
         urls = re.findall(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', body['body'])
 
-        if urls != []: body['url'] = urls
+        if urls != []: 
+            body['url'] = urls
+            body['body'] = re.sub(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', '', body['body'])
+            extract_urls(body)
         
-        body['body'] = re.sub(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', '', body['body'])
+        extract_body(body)
+
     except Exception as e:
         pass
-    
-    return body
 
 def tokenize(input_text):
     """

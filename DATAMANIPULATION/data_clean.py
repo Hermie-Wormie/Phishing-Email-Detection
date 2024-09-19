@@ -2,7 +2,7 @@
 
 import os
 import re
-from pandas import read_csv, to_datetime
+from pandas import read_csv
 from pathlib import Path
 
 from nltk import word_tokenize, download
@@ -38,21 +38,19 @@ def extract_subject(subjects):
     except Exception as e:
         pass
 
-def replace_urls(kms):
+def extract_urls(body):
         
     try:
 
-        urls = re.findall(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', kms)
+        urls = re.findall(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', body['body'])
+
+        if urls != []: body['url'] = urls
         
-        with open('../CLEANDATA/urls.csv','a') as f:
-            for url in urls:
-                f.write(url)
-        
-        kms = re.sub(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', '', kms)
+        body['body'] = re.sub(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', '', body['body'])
     except Exception as e:
         pass
     
-    return kms
+    return body
 
 def tokenize(input_text):
     """
@@ -95,7 +93,8 @@ def main(dataset: list):
 
         try:
 
-            df['body'] = df['body'].apply(replace_urls)
+            # extract_subject(df)
+            extract_urls(df)
 
             df.head(10)
         

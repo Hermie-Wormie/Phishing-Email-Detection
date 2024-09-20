@@ -37,3 +37,42 @@ if __name__ == "__main__":
     
     # Call the function to check the email
     check_email(subject, body)
+
+
+"""
+Test for non-phishing:
+
+Subject: Team Meeting Reminder
+
+Body: Hi Team,
+
+This is a reminder for our weekly team meeting scheduled for Thursday at 3 PM. We will discuss project updates and any challenges you might be facing.
+
+Please be prepared to share your progress.
+
+Best regards,
+James
+
+"""
+
+"""
+Test for phishing:
+
+Subject: Urgent: Update Your Account Information
+
+Body: Dear Valued Customer,
+
+We noticed unusual activity in your account. To ensure your security, we need you to verify your account information immediately. Click the link below to secure your account:
+
+[Update Your Account Now](https://fakebank.com/secure)
+
+Failure to verify your information within 24 hours will result in account suspension.
+
+Thank you for your prompt attention to this matter.
+
+Sincerely,
+Customer Support Team
+Fake Bank Inc.
+
+
+"""

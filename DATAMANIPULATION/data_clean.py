@@ -7,7 +7,7 @@ from pathlib import Path
 
 from nltk import word_tokenize, download
 
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup
 from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer
 
@@ -23,103 +23,68 @@ download('stopwords', quiet=True)
 # download('averaged_perceptron_tagger', quiet=True)
 # download('wordnet', quiet=True)
 # download('omw-1.4', quiet=True)
+count = 0
 
-def extract_sender(senders):
+def extract_tokens(tokens):
     try:
-        senders.drop(columns=['subject','body','urls'],inplace=True)
-        senders.dropna()
-        senders.drop_duplicates()
-        senders.to_csv(r'CLEANDATA\senders.csv',index=False)
-    except Exception as e:
-        pass
-
-def extract_subject(subjects):
-    try:
-        subjects.drop(columns=['sender','body','urls'],inplace=True)
-    except KeyError:
-        subjects.drop(columns=['body'],inplace=True)
-    except Exception as e:
-        pass
-    finally:
-        subjects.dropna()
-        subjects.drop_duplicates()
-        subjects.to_csv(r'CLEANDATA\subjects.csv',index=False)
-
-def extract_body(words):
-    try:
-        words.drop(columns=['url'],inplace=True)
+        tokens.fillna('', inplace = True)
+        tokens.drop_duplicates()
     except KeyError:
         pass
     except Exception as e:
         pass
     finally:
-        words.dropna()
+        if count == 0:
+            tokens.to_csv(r'CLEANDATA\tokens.csv',index=False,mode='a')
+        else:
+            tokens.to_csv(r'CLEANDATA\tokens.csv',index=False,mode='a',headers=None)
+
+def extract_data(words):
+    try:
+        words.fillna('', inplace = True)
+        # words.dropna()
         words.drop_duplicates()
-        words.to_csv(r'CLEANDATA\body.csv',index=False)
-
-def extract_urls(url):
-    try:
-        url.drop(columns=['body'],inplace=True)
-        url.dropna()
-        url.to_csv(r'CLEANDATA\urls.csv',index=False)
+    except KeyError:
+        pass
     except Exception as e:
         pass
+    finally:
+        if count == 0:
+            words.to_csv(r'CLEANDATA\data-1.csv',index=False,mode='a')
+        elif count > 2:
+            words.to_csv(r'CLEANDATA\data-2.csv',index=False,mode='a',headers=None)
+        elif count > 1:
+            words.to_csv(r'CLEANDATA\data-2.csv',index=False,mode='a')
+        else:
+            words.to_csv(r'CLEANDATA\data-1.csv',index=False,mode='a',headers=None)
 
 def replace_urls(body):
     url_dict = {}
-    
-    try:
-
-        body.drop(columns=['sender','subject','urls'],inplace=True)
-    
-    except KeyError:
-
-        body.drop(columns=['subject'],inplace=True)
-
-    except Exception as e:
-        pass
 
     try:
         for i in range(body.shape[0]):
 
-            urls = re.findall(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', body.values[i][0])
+            urls = re.findall(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', body.loc[i,"body"])
 
             if urls != []: 
-                
+
+                urls = ','.join(urls)                
                 url_dict.update({i:urls})
                 body.loc[i,"body"] = re.sub(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', '', body.loc[i,"body"])
+                body.loc[i,"body"] = re.sub(r'\n', ' ', body.loc[i,"body"])
             
             else: url_dict.update({i:''})
 
             # will be editing soon
-            tokens = body.copy()
-            body.loc[i,"body"] = sanitize_whitespace(body.loc[i,"body"])
+            tokens = (body.copy())
         
         if url_dict != {}:
-            body['url'] = body.index.map(url_dict)
-            extract_urls(body.copy())
+            body.insert(3, 'url', body.index.map(url_dict))
         
-        extract_body(body.copy())
+        extract_data(body.copy())
     
     except Exception as e:
         pass
-
-def sanitize_whitespace(input_string):
-    """
-    Remove extra whitespace
-    """
-    lines = input_string.split('\n')
-    for index, line  in enumerate(lines):
-        if line=='.':
-            lines.remove(line)
-            for i in range(1, len(lines)): # check for lines that contain text
-                if (lines[index-i] != ''):
-                    lines[index-i] += '.'
-                    break
-                    
-    output_string = '\n'.join(lines)
-    
-    return output_string.strip()
 
 def tokenize(input_text):
     """
@@ -152,22 +117,21 @@ def main(dataset: list):
         # df.info()
         
         df = kill_duplicates(df)
+        if 'sender' not in df.columns: df.insert(0,'sender',df.index.map({x:'' for x in range(df.shape[0])}))
 
         try:
             # for csvs with "receiver" and "date" columns
-            df.drop(columns=['receiver','date'],inplace=True)
+            df.drop(columns=['receiver','date','urls'],inplace=True)
                         
         except Exception as e:
             pass
 
         try:
 
-            # extract_subject(df)
             replace_urls(df.copy())
-            extract_sender(df.copy())
-            extract_subject(df.copy())
 
             df.head(10)
+            count += 1
         
         except Exception as e:
             pass

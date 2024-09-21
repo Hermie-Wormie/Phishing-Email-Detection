@@ -37,7 +37,7 @@ def extract_tokens(tokens):
         if count == 0:
             tokens.to_csv(r'CLEANDATA\tokens.csv',index=False,mode='a')
         else:
-            tokens.to_csv(r'CLEANDATA\tokens.csv',index=False,mode='a',headers=None)
+            tokens.to_csv(r'CLEANDATA\tokens.csv',index=False,mode='a',header=False)
 
 def extract_data(words):
     try:
@@ -52,26 +52,27 @@ def extract_data(words):
         if count == 0:
             words.to_csv(r'CLEANDATA\data-1.csv',index=False,mode='a')
         elif count > 2:
-            words.to_csv(r'CLEANDATA\data-2.csv',index=False,mode='a',headers=None)
+            words.to_csv(r'CLEANDATA\data-2.csv',index=False,mode='a',header=False)
         elif count > 1:
             words.to_csv(r'CLEANDATA\data-2.csv',index=False,mode='a')
         else:
-            words.to_csv(r'CLEANDATA\data-1.csv',index=False,mode='a',headers=None)
+            words.to_csv(r'CLEANDATA\data-1.csv',index=False,mode='a',header=False)
 
 def replace_urls(body):
     url_dict = {}
+    body.fillna('',inplace=True)
 
     try:
         for i in range(body.shape[0]):
 
-            urls = re.findall(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', body.loc[i,"body"])
+            urls = re.findall(r'(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})', body.loc[i,"body"])
 
             if urls != []: 
 
                 urls = ','.join(urls)                
                 url_dict.update({i:urls})
-                body.loc[i,"body"] = re.sub(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', '', body.loc[i,"body"])
-                body.loc[i,"body"] = re.sub(r'\n', ' ', body.loc[i,"body"])
+                body.loc[i,"body"] = re.sub(r'(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})', '', body.loc[i,"body"])
+                body.loc[i,"body"] = re.sub(r'[\r\n]+', ' ', body.loc[i,"body"])
             
             else: url_dict.update({i:''})
 
@@ -105,18 +106,14 @@ def remove_stopwords(tokenized_text):
     
     return clean_list
 
-def kill_duplicates(df):
-    df_new = df.drop_duplicates()
-    
-    return df_new
-
 def main(dataset: list):
+    global count
 
     for data in dataset:
         df = read_csv(data)
         # df.info()
         
-        df = kill_duplicates(df)
+        df.drop_duplicates()
         if 'sender' not in df.columns: df.insert(0,'sender',df.index.map({x:'' for x in range(df.shape[0])}))
 
         try:

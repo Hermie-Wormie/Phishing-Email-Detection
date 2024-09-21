@@ -42,7 +42,6 @@ def extract_tokens(tokens):
 def extract_data(words):
     try:
         words.fillna('', inplace = True)
-        # words.dropna()
         words.drop_duplicates()
     except KeyError:
         pass
@@ -51,12 +50,10 @@ def extract_data(words):
     finally:
         if count == 0:
             words.to_csv(r'CLEANDATA\data-1.csv',index=False,mode='a')
-        elif count > 2:
-            words.to_csv(r'CLEANDATA\data-2.csv',index=False,mode='a',header=False)
         elif count > 1:
-            words.to_csv(r'CLEANDATA\data-2.csv',index=False,mode='a')
+            words.to_csv(r'CLEANDATA\data-2.csv',index=False,mode='a',header=False)
         else:
-            words.to_csv(r'CLEANDATA\data-1.csv',index=False,mode='a',header=False)
+            words.to_csv(r'CLEANDATA\data-2.csv',index=False,mode='a')
 
 def replace_urls(body):
     url_dict = {}

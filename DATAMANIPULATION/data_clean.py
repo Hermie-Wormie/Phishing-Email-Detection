@@ -94,6 +94,10 @@ def tokenize(input_text):
     
     return clean_list
 
+#def whitespace_sanitize(body):
+
+#def addr_sanitize(body):
+
 def remove_stopwords(tokenized_text):
     """
     Remove stopwords from a list of words.

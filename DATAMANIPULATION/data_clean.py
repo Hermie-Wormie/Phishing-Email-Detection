@@ -1,18 +1,9 @@
 '''work in progress'''
 
-import os
 import re
 from pandas import read_csv
-from pathlib import Path
-
-from nltk import word_tokenize, download
-
-# from bs4 import BeautifulSoup
-from sklearn.model_selection import train_test_split
-from sklearn.impute import SimpleImputer
-
-import random
-random.seed(1746)
+from functools import reduce
+from nltk import word_tokenize, download, pos_tag
 
 from nltk.corpus import stopwords
 from nltk.corpus import wordnet
@@ -20,24 +11,10 @@ from nltk.stem.wordnet import WordNetLemmatizer
 
 download('punkt_tab', quiet=True)
 download('stopwords', quiet=True)
-# download('averaged_perceptron_tagger', quiet=True)
-# download('wordnet', quiet=True)
-# download('omw-1.4', quiet=True)
+download('averaged_perceptron_tagger', quiet=True)
+download('wordnet', quiet=True)
+download('omw-1.4', quiet=True)
 count = 0
-
-def extract_tokens(tokens):
-    try:
-        tokens.fillna('', inplace = True)
-        tokens.drop_duplicates()
-    except KeyError:
-        pass
-    except Exception as e:
-        pass
-    finally:
-        if count == 0:
-            tokens.to_csv(r'CLEANDATA\tokens.csv',index=False,mode='a')
-        else:
-            tokens.to_csv(r'CLEANDATA\tokens.csv',index=False,mode='a',header=False)
 
 def extract_data(words):
     try:
@@ -73,8 +50,8 @@ def replace_urls(body):
             
             else: url_dict.update({i:''})
 
-            # will be editing soon
-            tokens = (body.copy())
+            body.loc[i,"body"] = process_text(body.loc[i,"body"])
+            body.loc[i,"subject"] = process_text(body.loc[i,"subject"])
         
         if url_dict != {}:
             body.insert(3, 'url', body.index.map(url_dict))
@@ -106,6 +83,41 @@ def remove_stopwords(tokenized_text):
     clean_list = [word for word in tokenized_text if word not in stop_words]
     
     return clean_list
+
+def get_wordnet_pos(treebank_tag):
+    """
+    Converts a Treebank part-of-speech tag to WordNet.
+    """
+    if treebank_tag.startswith('J'):
+        return wordnet.ADJ
+    elif treebank_tag.startswith('V'):
+        return wordnet.VERB
+    elif treebank_tag.startswith('N'):
+        return wordnet.NOUN
+    elif treebank_tag.startswith('R'):
+        return wordnet.ADV
+    else:
+        return None
+
+def lemmatize(token_list):
+    """
+    Lemmatizes a list of tokens using WordNet lemmatizer.
+    """
+    lemmatizer = WordNetLemmatizer()
+    tagged_list = pos_tag(token_list)
+    
+    lemmatized_list = [lemmatizer.lemmatize(word)
+                       if get_wordnet_pos(tag) is None
+                       else lemmatizer.lemmatize(word, pos=get_wordnet_pos(tag))
+                       for word, tag in tagged_list]
+    
+    return lemmatized_list
+
+def join_list(lst: list):
+    return ' '.join(lst)
+
+def process_text(input_text):
+    return reduce(lambda x, func: func(x), [tokenize, remove_stopwords, lemmatize, join_list], input_text)
 
 def main(dataset: list):
     global count

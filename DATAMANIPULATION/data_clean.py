@@ -1,5 +1,3 @@
-'''work in progress'''
-
 import re
 from pandas import read_csv
 from functools import reduce

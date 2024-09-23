@@ -15,6 +15,10 @@ download('omw-1.4', quiet=True)
 count = 0
 
 def extract_data(words):
+    """
+    Fills all NA values with empty string, 
+    Before writing these into the cleaned dataset
+    """
     try:
         words.fillna('', inplace = True)
         words.drop_duplicates()
@@ -31,6 +35,11 @@ def extract_data(words):
             words.to_csv(r'CLEANDATA\data-2.csv',index=False,mode='a')
 
 def replace_urls(body):
+    """
+    Finds urls in email body, 
+    Replaces urls with empty string, 
+    Calls functions to normalise email body and email subject
+    """
     url_dict = {}
     body.fillna('',inplace=True)
 
@@ -112,12 +121,24 @@ def lemmatize(token_list):
     return lemmatized_list
 
 def join_list(lst: list):
+    """
+    Joins the list together by spaces to form a string
+    """
     return ' '.join(lst)
 
 def process_text(input_text):
+    """
+    Conbines text normalisation functions into one higher order function
+    """
     return reduce(lambda x, func: func(x), [tokenize, remove_stopwords, lemmatize, join_list], input_text)
 
-def main(dataset: list):
+def dataset_cleaning(dataset: list):
+    """
+    Reads the datasets provided,
+    Remove any duplicates (?)
+    Drops unused columns
+    Calls functions to clean data
+    """
     global count
 
     for data in dataset:
@@ -144,4 +165,6 @@ def main(dataset: list):
         except Exception as e:
             pass
 
-
+def email_cleaning(email):
+    df = read_csv(email)
+    print(df.columns)

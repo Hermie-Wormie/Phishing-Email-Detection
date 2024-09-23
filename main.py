@@ -1,9 +1,13 @@
 import os
 import shutil
 from pathlib import Path
-from DATAMANIPULATION.data_clean import main as clean_data
+from DATAMANIPULATION.data_clean import dataset_cleaning
 
 def extract_data():
+    """
+    Recreates CLEANDATA folder and child items
+    Returns a list of all child items in DATASET
+    """
     dataset_dir = Path("DATASET")
     cleandata_dir = Path("CLEANDATA")
     
@@ -27,7 +31,7 @@ def extract_data():
 
 def main():
     
-    clean_data(extract_data())
+    dataset_cleaning(extract_data())
 
 if __name__ == "__main__":
     try:

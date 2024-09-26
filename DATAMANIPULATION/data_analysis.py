@@ -1,6 +1,6 @@
 '''work in progress'''
 
-import pandas as pd
+from pandas import Series, to_datetime, read_csv, concat
 import matplotlib.pyplot as plt
 import seaborn as sns
 from wordcloud import WordCloud
@@ -64,6 +64,19 @@ def link_analysis(df):
     plt.legend()
     plt.show()
 
+def time_count(df):
+    df['time_sent'] = to_datetime(df['date']).dt.hour
+
+    hour_counts = df['time_sent'].value_counts().sort_index()
+    hour_counts.plot(kind='line', marker='o')
+    plt.title('Frequency of Emails Sent by Hour')
+    plt.xlabel('Hour of Day')
+    plt.ylabel('Count')
+    plt.xticks(range(24))
+    plt.grid()
+    plt.show()
+
+
 def sentiment_analysis(df):
     sia = SentimentIntensityAnalyzer()
     df['sentiment'] = df['body'].apply(lambda x: sia.polarity_scores(x)['compound'])
@@ -80,7 +93,7 @@ def analyze_sentiment(text):
 
 def visualise_sentiment2(df):
     # Apply the function to the content column
-    df[['polarity', 'subjectivity']] = df['body'].apply(lambda x: analyze_sentiment(x)).apply(pd.Series)
+    df[['polarity', 'subjectivity']] = df['body'].apply(lambda x: analyze_sentiment(x)).apply(Series)
 
     # Visualize the sentiment analysis results
     plt.figure(figsize=(12, 6))
@@ -99,3 +112,6 @@ def visualise_sentiment2(df):
 
     plt.tight_layout()
     plt.show()
+
+def read_files(dataset: list):
+    return concat(map(read_csv, dataset ), ignore_index=True)

@@ -14,8 +14,7 @@ def extract_data():
     datasets: list[Path] = []
     datasets.extend(dataset_dir.glob(ext))
 
-    sep_data: list[Path] = []
-    sep_data.extend(cleandata_dir.glob(ext))
+    sep_data = read_cleandata(cleandata_dir, ext)
 
     status = cleandata_dir.exists()
     if status:
@@ -25,6 +24,17 @@ def extract_data():
     cleandata_dir.mkdir()
     for path in sep_data:
         path.touch()
+
+    return datasets
+
+def read_cleandata(cleandata_dir, ext):
+    """
+    Reads CLEANDATA dir
+    Returns all child items in CLEANDATA
+    """
+
+    datasets: list[Path] = []
+    datasets.extend(cleandata_dir.glob(ext))
 
     return datasets
 

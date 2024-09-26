@@ -61,7 +61,7 @@ def replace_urls(body):
             body.loc[i,"subject"] = process_text(body.loc[i,"subject"])
         
         if url_dict != {}:
-            body.insert(3, 'url', body.index.map(url_dict))
+            body.insert(4, 'url', body.index.map(url_dict))
         
         extract_data(body.copy())
     
@@ -77,10 +77,6 @@ def tokenize(input_text):
     clean_list = [word for word in token_list if len(re.findall(r'^[a-zA-Z0-9]+-?[\w-]*$', word)) == 1]
     
     return clean_list
-
-#def whitespace_sanitize(body):
-
-#def addr_sanitize(body):
 
 def remove_stopwords(tokenized_text):
     """
@@ -146,11 +142,13 @@ def dataset_cleaning(dataset: list):
         # df.info()
         
         df.drop_duplicates()
-        if 'sender' not in df.columns: df.insert(0,'sender',df.index.map({x:'' for x in range(df.shape[0])}))
+        for word in ['date','sender']:
+            if word not in df.columns: 
+                df.insert(0,word,df.index.map({x:'' for x in range(df.shape[0])}))
 
         try:
             # for csvs with "receiver" and "date" columns
-            df.drop(columns=['receiver','date','urls'],inplace=True)
+            df.drop(columns=['receiver','urls'],inplace=True)
                         
         except Exception as e:
             pass

@@ -1,5 +1,5 @@
 import re
-from pandas import read_csv
+from pandas import read_csv, read_xml
 from functools import reduce
 from nltk import word_tokenize, download, pos_tag
 
@@ -166,5 +166,7 @@ def dataset_cleaning(dataset: list):
             pass
 
 def email_cleaning(email):
+    """idk """
+
     df = read_csv(email)
     print(df.columns)

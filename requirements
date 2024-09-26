@@ -9,3 +9,5 @@ ipykernel
 nltk
 requests
 tkinter
+wordcloud
+textblob

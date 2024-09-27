@@ -39,32 +39,30 @@ def check_url(url):
     if response.status_code == 200:
         result = response.json()
         if result:
-            return result
+            url_scan_results(result)
         else:
-            print("Empty response from VirusTotal.")
-            return None
+            return "Empty response from VirusTotal."
     else:
-        print(f"Error: {response.status_code} from VirusTotal")
-        return None
+        return f"Error: {response.status_code} from VirusTotal"
 
 
-def print_url_scan_results(result):
+def url_scan_results(result):
     if result is None:
-        print("No result returned from VirusTotal.")
-        return
+        return "No result returned from VirusTotal."
 
-    print(f"Scanning URL: {result['resource']}")
     if result['response_code'] == 1:
         if result['positives'] > 0:
-            print(f"Malicious! Positives: {result['positives']}")
-            print(f"Vendors that flagged this site as malicious:")
-            for vendor, report in result['scans'].items():
-                if report['detected']:
-                    print(f"     - {vendor}: {report['result']}")
+            return result['positives']
+        #     print(f"Vendors that flagged this site as malicious:")
+        #     for vendor, report in result['scans'].items():
+        #         if report['detected']:
+        #             print(f"     - {vendor}: {report['result']}")
+        # else:
+        #     print("Clean URL")
         else:
-            print("Clean URL")
+            return "Clean URL"
     else:
-        print("URL not found in VirusTotal database\n")
+        return "URL not found in VirusTotal database"
 
 
 def print_hash_scan_results(result):

@@ -39,7 +39,8 @@ def check_url(url):
     if response.status_code == 200:
         result = response.json()
         if result:
-            url_scan_results(result)
+            return url_scan_results(result)
+            
         else:
             return "Empty response from VirusTotal."
     else:
@@ -53,6 +54,7 @@ def url_scan_results(result):
     if result['response_code'] == 1:
         if result['positives'] > 0:
             numPositive = result['positives']
+            print(numPositive)
             return numPositive
         #     print(f"Vendors that flagged this site as malicious:")
         #     for vendor, report in result['scans'].items():
@@ -86,11 +88,11 @@ def print_hash_scan_results(result):
 if __name__ == "__main__":
 
     # URL and Filepath of attachment
-    url = "http://myetherevvalliet.com/"
+    url = "http://www.myetherevvalliet.com/"
     file_path = r"C:\Users\herma\OneDrive\Desktop\hi.jpg"
 
     # Check URL on VirusTotal
-    # check_url(url)
+    # print(check_url(url))
 
     # Test malicious hash: b1b74ff5c67cfdc16f1cb30db9b885046c4c5d71af575a2d3de4a79918c1ce89
     # hash_result = check_hash("b1b74ff5c67cfdc16f1cb30db9b885046c4c5d71af575a2d3de4a79918c1ce89")

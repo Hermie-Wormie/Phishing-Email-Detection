@@ -27,7 +27,7 @@ def extract_data():
 
     return datasets
 
-def read_cleandata(cleandata_dir, ext):
+def read_cleandata(cleandata_dir=Path("CLEANDATA"), ext="*.csv"):
     """
     Reads CLEANDATA dir
     Returns all child items in CLEANDATA

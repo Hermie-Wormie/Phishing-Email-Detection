@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import filedialog
 import re
-
+from VirusTotal import *
+from model_test import *
+from model import *
 
 #=========================== Functions ===========================
 
@@ -11,8 +13,11 @@ def show_home():
     home_frame.pack(fill='both', expand=True)
 
 def show_model():
-    home_frame.pack_forget()
-    model_frame.pack(fill='both', expand=True)
+    #home_frame.pack_forget()
+    #model_frame.pack(fill='both', expand=True)
+    print('ok')
+    plot_confusion_matrix(y_test, y_pred)
+    plot_roc_curve(y_test, y_pred_proba)
 
 def show_phishingResult():
     home_frame.pack_forget()
@@ -47,7 +52,12 @@ def on_input_change(event):
     validate_URL_input()
 
 def check_phishing():
-    print("phish")  
+    url = url_entry.get().strip()
+    print(url)
+    print(check_url(url))
+    hash = hash_entry.get().strip()
+    print(hash)
+    print(check_hash(hash))  
 
 def check_entries():
     sender = sender_entry.get().strip()
@@ -90,14 +100,15 @@ def bind_entries():
     url_entry.bind('<KeyRelease>', lambda event: check_entries())
 
 def getHash():
-    print("Hash")
+    print("hash")
 
 def upload_file():
     file_path = filedialog.askopenfilename()
+    
     if file_path:
-        getHash()
+        hash = file_to_hash(file_path)
         hash_entry.delete(0, tk.END)  # Clear any existing text in the entry
-        hash_entry.insert(0, "12345")  # Insert "12345" into the hash_entry
+        hash_entry.insert(0, hash)  # Insert "12345" into the hash_entry
 
 # Create the main application window
 root = tk.Tk()
@@ -134,7 +145,7 @@ sender_label = tk.Label(home_frame, text="Enter the Sender:", bg='navy', fg='whi
 sender_label.grid(row=1, column=1, padx=10, pady=5, sticky='e')
 
 sender_entry = tk.Entry(home_frame)
-sender_entry.grid(row=1, column=2, padx=10, pady=5, sticky='w')
+sender_entry.grid(row=1, column=2, padx=10, pady=5, sticky='w', columnspan=3)
 
 subject_label = tk.Label(home_frame, text="Enter the Subject:", bg='navy', fg='white')
 subject_label.grid(row=2, column=1, padx=10, pady=5, sticky='e')
@@ -164,7 +175,7 @@ hash_entry.grid(row=5, column=2, padx=10, pady=5, sticky='w')
 upload_button = tk.Button(home_frame, text="Upload File to get Hash", command=upload_file)
 upload_button.grid(row=7, column=1, sticky='e')  # Positioned in the right column
 
-checkResults_button = tk.Button(home_frame, text="Check for Phishing", command=show_phishingResult)
+checkResults_button = tk.Button(home_frame, text="Check for Phishing", command=check_phishing)
 
 
 # Bind the URL entry to detect changes

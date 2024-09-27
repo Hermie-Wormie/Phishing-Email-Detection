@@ -46,14 +46,14 @@ precision = precision_score(y_test, y_pred)
 recall = recall_score(y_test, y_pred)
 f1 = f1_score(y_test, y_pred)
 
-print(f"Accuracy: {accuracy:.4f}")
-print(f"Precision: {precision:.4f}")
-print(f"Recall: {recall:.4f}")
-print(f"F1-Score: {f1:.4f}")
+#print(f"Accuracy: {accuracy:.4f}")
+#print(f"Precision: {precision:.4f}")
+#print(f"Recall: {recall:.4f}")
+#print(f"F1-Score: {f1:.4f}")
 
 # Optionally, print out a more detailed classification report
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
+#print("\nClassification Report:")
+#print(classification_report(y_test, y_pred))
 
 # -- Graphing Section Starts Here --
 # Define the plotting functions
@@ -112,10 +112,10 @@ def plot_feature_importance(vectorizer, model):
 y_pred_proba = log_reg_model.predict_proba(X_test_tfidf)[:, 1]
 
 # Call the plotting functions
-plot_confusion_matrix(y_test, y_pred)
-plot_roc_curve(y_test, y_pred_proba)
-plot_precision_recall_curve(y_test, y_pred_proba)
-plot_feature_importance(tfidf_vectorizer, log_reg_model)
+#plot_confusion_matrix(y_test, y_pred)
+#plot_roc_curve(y_test, y_pred_proba)
+#plot_precision_recall_curve(y_test, y_pred_proba)
+#plot_feature_importance(tfidf_vectorizer, log_reg_model)
 
 
 """

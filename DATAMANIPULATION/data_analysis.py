@@ -35,20 +35,22 @@ def sender_domain(df):
     except Exception as e:
         print(e)
 
-def email_content_length(df):
-    try:
-        df = df.dropna(subset=['body'])
-        df = df[df['body'].str.strip() != '']
-        df['content_length'] = df['body'].apply(lambda x: len(x))
+# content length graph looks a bit weird
 
-        plt.figure(figsize=(10, 5))
-        sns.boxplot(x='label', y='content_length', data=df)
-        plt.title('Length of Email Content')
-        plt.xlabel('Email Type')
-        plt.ylabel('Content Length')
-        plt.show()
-    except Exception as e:
-        print(e)
+# def email_content_length(df):
+#     try:
+#         df = df.dropna(subset=['body'])
+#         df = df[df['body'].str.strip() != '']
+#         df['content_length'] = df['body'].apply(lambda x: len(x))
+
+#         plt.figure(figsize=(10, 5))
+#         sns.boxplot(x='label', y='content_length', data=df)
+#         plt.title('Length of Email Content')
+#         plt.xlabel('Email Type')
+#         plt.ylabel('Content Length')
+#         plt.show()
+#     except Exception as e:
+#         print(e)
 
 def feature_frequency(df):
     try:
@@ -72,21 +74,26 @@ def feature_frequency(df):
     except Exception as e:
         print(e)
 
-def link_analysis(df):
-    try:
-        df = df.dropna(subset=['url'])
-        df = df[df['url'].str.strip() != '']
-        df['link_count'] = df['url'].apply(lambda x: x.count('http'))
+# link analysis graph looks weird too
 
-        plt.hist(df[df['label'] == 1]['link_count'], bins=20, alpha=0.5, label='Phishing', color='red')
-        plt.hist(df[df['label'] == 0]['link_count'], bins=20, alpha=0.5, label='Legitimate', color='blue')
-        plt.title('Distribution of Link Counts')
-        plt.xlabel('Number of Links')
-        plt.ylabel('Frequency')
-        plt.legend()
-        plt.show()
-    except Exception as e:
-        print(e)
+# def link_analysis(df):
+#     try:
+#         df = df.dropna(subset=['url'])
+#         df = df[df['url'].str.strip() != '']
+#         df['link_count'] = df['url'].apply(lambda x: x.count('http'))
+#         plt.figure(figsize=(12, 6))
+
+#         plt.hist(df[df['label'] == 1]['link_count'], bins=30, alpha=0.6, label='Phishing', color='red')
+#         plt.hist(df[df['label'] == 0]['link_count'], bins=30, alpha=0.6, label='Legitimate', color='blue')
+#         plt.title('Distribution of Link Counts')
+#         plt.xlabel('Number of Links')
+#         plt.ylabel('Frequency')
+#         plt.legend()
+#         plt.ylim(0, df['link_count'].value_counts().max() + 5)
+#         plt.grid(axis='y', alpha=0.75)
+#         plt.show()
+#     except Exception as e:
+#         print(e)
 
 def time_count(df):
     try:

@@ -26,9 +26,34 @@ def check_hash(file_hash):
     }
     response = requests.get(url, params=params)
     if response.status_code == 200:
-        return response.json()
+        result = response.json()
+        if result:
+            return hash_scan_results(result)
+        
+        else:
+            return "Empty response from VirusTotal."
     else:
         return f"Error: {response.status_code}"
+
+
+def hash_scan_results(result):
+    if result['response_code'] == 1:
+        # print(f"Hash: {result['resource']}")
+
+        if result['positives'] > 0:
+            numPositives = result['positives']
+            print(numPositives)
+            return numPositives
+            # print(f"Malicious! Positives: {result['positives']}")
+            # print(f"Vendors that flagged this file as malicious:")
+
+            # for vendor, report in result['scans'].items():
+            #     if report['detected']:
+            #         print(f"     - {vendor}: {report['result']}")
+        else:
+            return "The file is clean."
+    else:
+        return "Hash not found in VirusTotal database."
 
 
 def check_url(url):
@@ -40,7 +65,7 @@ def check_url(url):
         result = response.json()
         if result:
             return url_scan_results(result)
-            
+
         else:
             return "Empty response from VirusTotal."
     else:
@@ -54,7 +79,6 @@ def url_scan_results(result):
     if result['response_code'] == 1:
         if result['positives'] > 0:
             numPositive = result['positives']
-            print(numPositive)
             return numPositive
         #     print(f"Vendors that flagged this site as malicious:")
         #     for vendor, report in result['scans'].items():
@@ -66,23 +90,6 @@ def url_scan_results(result):
             return "Clean URL"
     else:
         return "URL not found in VirusTotal database"
-
-
-def print_hash_scan_results(result):
-    if result['response_code'] == 1:
-        print(f"Hash: {result['resource']}")
-
-        if result['positives'] > 0:
-            print(f"Malicious! Positives: {result['positives']}")
-            print(f"Vendors that flagged this file as malicious:")
-
-            for vendor, report in result['scans'].items():
-                if report['detected']:
-                    print(f"     - {vendor}: {report['result']}")
-        else:
-            print("The file is clean.")
-    else:
-        print("Hash not found in VirusTotal database.\n")
 
 
 if __name__ == "__main__":
@@ -97,7 +104,6 @@ if __name__ == "__main__":
     # Test malicious hash: b1b74ff5c67cfdc16f1cb30db9b885046c4c5d71af575a2d3de4a79918c1ce89
     # hash_result = check_hash("b1b74ff5c67cfdc16f1cb30db9b885046c4c5d71af575a2d3de4a79918c1ce89")
 
-    # Hash file then check VirusTotal 
+    # Hash file then check VirusTotal
     # hash_of_file = file_to_hash(file_path)
-    # hash_result = check_hash(hash_of_file)
-    # print_hash_scan_results(hash_result)
+    # check_hash("b1b74ff5c67cfdc16f1cb30db9b885046c4c5d71af575a2d3de4a79918c1ce89")

@@ -7,7 +7,10 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 
 # Step 1: Load the cleaned dataset
 # Assuming your dataset has two columns: 'email_text' (the email content) and 'label' (0 for non-phishing, 1 for phishing)
-df = pd.read_csv('CLEANDATA/body.csv')
+df = pd.read_csv('CLEANDATA/data-1.csv',  usecols=['body', 'label'])
+
+# Remove rows with missing values in the 'body' column
+df = df.dropna(subset=['body'])
 
 # Step 2: Split the dataset into training and testing sets (80% train, 20% test)
 X_train, X_test, y_train, y_test = train_test_split(df['body'], df['label'], test_size=0.2, random_state=42)

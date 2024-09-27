@@ -52,7 +52,8 @@ def url_scan_results(result):
 
     if result['response_code'] == 1:
         if result['positives'] > 0:
-            return result['positives']
+            numPositive = result['positives']
+            return numPositive
         #     print(f"Vendors that flagged this site as malicious:")
         #     for vendor, report in result['scans'].items():
         #         if report['detected']:
@@ -89,13 +90,12 @@ if __name__ == "__main__":
     file_path = r"C:\Users\herma\OneDrive\Desktop\hi.jpg"
 
     # Check URL on VirusTotal
-    url_result = check_url(url)
-    print_url_scan_results(url_result)
+    # check_url(url)
 
     # Test malicious hash: b1b74ff5c67cfdc16f1cb30db9b885046c4c5d71af575a2d3de4a79918c1ce89
-    hash_result = check_hash("b1b74ff5c67cfdc16f1cb30db9b885046c4c5d71af575a2d3de4a79918c1ce89")
+    # hash_result = check_hash("b1b74ff5c67cfdc16f1cb30db9b885046c4c5d71af575a2d3de4a79918c1ce89")
 
     # Hash file then check VirusTotal 
     # hash_of_file = file_to_hash(file_path)
     # hash_result = check_hash(hash_of_file)
-    print_hash_scan_results(hash_result)
+    # print_hash_scan_results(hash_result)

@@ -14,18 +14,19 @@ download('wordnet', quiet=True)
 download('omw-1.4', quiet=True)
 count = 0
 
+# <---------------------------- Writing into files function ---------------------------->
 def extract_data(words):
     """
     Fills all NA values with empty string, 
-    Before writing these into the cleaned dataset
+    Before writing these into the cleandata files
     """
     try:
         words.fillna('', inplace = True)
         words.drop_duplicates()
     except KeyError:
-        pass
+        print('KeyError')
     except Exception as e:
-        pass
+        print(e)
     finally:
         if count == 0:
             words.to_csv(r'CLEANDATA\data-1.csv',index=False,mode='a')
@@ -34,11 +35,14 @@ def extract_data(words):
         else:
             words.to_csv(r'CLEANDATA\data-2.csv',index=False,mode='a')
 
+
+# <---------------------------- Replacing text urls function --------------------------->
 def replace_urls(body):
     """
     Finds urls in email body, 
     Replaces urls with empty string, 
     Calls functions to normalise email body and email subject
+    Returns cleaned dataset
     """
     url_dict = {}
     body.fillna('',inplace=True)
@@ -63,11 +67,13 @@ def replace_urls(body):
         if url_dict != {}:
             body.insert(4, 'url', body.index.map(url_dict))
         
-        extract_data(body.copy())
+        return body
     
     except Exception as e:
-        pass
+        print(e)
 
+
+# <-------------------------- Normalising text data functions -------------------------->
 def tokenize(input_text):
     """
     Convert a string of text to a list with words.
@@ -128,6 +134,8 @@ def process_text(input_text):
     """
     return reduce(lambda x, func: func(x), [tokenize, remove_stopwords, lemmatize, join_list], input_text)
 
+
+# <------------------------------ main cleaning function ------------------------------>
 def dataset_cleaning(dataset: list):
     """
     Reads the datasets provided,
@@ -139,7 +147,6 @@ def dataset_cleaning(dataset: list):
 
     for data in dataset:
         df = read_csv(data)
-        # df.info()
         
         df.drop_duplicates()
         for word in ['date','sender']:
@@ -155,14 +162,16 @@ def dataset_cleaning(dataset: list):
 
         try:
 
-            replace_urls(df.copy())
+            new_df = replace_urls(df.copy())
+            extract_data(new_df.copy())
 
-            df.head(10)
             count += 1
         
         except Exception as e:
-            pass
+            print(e)
 
+
+# <---------------------------- may and may not be used ---------------------------->
 def email_cleaning(email):
     """idk """
 

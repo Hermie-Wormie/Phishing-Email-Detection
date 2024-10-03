@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 import re
+import webbrowser
 from VirusTotal import *
 from model_test import *
 from model import *
@@ -15,9 +16,7 @@ def show_home():
 def show_model():
     #home_frame.pack_forget()
     #model_frame.pack(fill='both', expand=True)
-    print('ok')
     plot_confusion_matrix(y_test, y_pred)
-    plot_roc_curve(y_test, y_pred_proba)
 
 def show_phishingResult():
     home_frame.pack_forget()
@@ -53,11 +52,49 @@ def on_input_change(event):
 
 def check_phishing():
     url = url_entry.get().strip()
-    print(url)
-    print(check_url(url))
     hash = hash_entry.get().strip()
-    print(hash)
-    print(check_hash(hash))  
+    sender = sender_entry.get().strip()
+    subject = subject_entry.get().strip()
+    content = content_entry.get().strip()
+    emailPositive = check_email(sender, subject, content)
+    urlPositive = check_url(url)
+    hashPositive = check_hash(hash)
+    urlPositive_button.grid_forget()
+    hashPositive_button.grid_forget()
+
+    emailPositive_label.config(text=f"Based on our dataset, your email is likely to be a:     {emailPositive}")
+    if isinstance(urlPositive, tuple):
+        urlPositive_label.config(text=f"Number of positive results for malicious URL:           {urlPositive[0]}")
+        urlPositive_button.grid(row=2, column=2, padx=5, pady=5, sticky='w')
+    elif urlPositive == "Clean URL":
+        urlPositive_label.config(text="Number of positive results for malicious URL:           Clean URL")
+    elif urlPositive == "URL not found in VirusTotal database":
+        urlPositive_label.config(text="Number of positive results for malicious URL:           URL not found in VirusTotal")
+    else:
+        urlPositive_label.config(text="Number of positive results for malicious URL:           No input provided")
+
+    if isinstance(hashPositive, tuple):
+        hashPositive_label.config(text=f"Number of positive results for malicious Hash:         {hashPositive[0]}")
+        hashPositive_button.grid(row=3, column=2, padx=5, pady=5, sticky='w')
+    elif hashPositive == "The file is clean.":
+        hashPositive_label.config(text="Number of positive results for malicious Hash:         Clean File")
+    elif hashPositive == "Hash of file not found in VirusTotal database.":
+        hashPositive_label.config(text="Number of positive results for malicious Hash:         File Hash not found in VirusTotal")
+    else:
+        hashPositive_label.config(text="Number of positive results for malicious Hash:         No input provided")
+    show_phishingResult()
+
+def view_URL_positives():
+    url = url_entry.get().strip()
+    urlPositive = (check_url(url))
+    hyperlink = urlPositive[1]
+    webbrowser.open(hyperlink)
+
+def view_hash_positives():
+    hash = hash_entry.get().strip()
+    hashPositive = (check_hash(hash))
+    hyperlink = hashPositive[1]
+    webbrowser.open(hyperlink)
 
 def check_entries():
     sender = sender_entry.get().strip()
@@ -99,9 +136,6 @@ def bind_entries():
     content_entry.bind('<KeyRelease>', lambda event: check_entries())
     url_entry.bind('<KeyRelease>', lambda event: check_entries())
 
-def getHash():
-    print("hash")
-
 def upload_file():
     file_path = filedialog.askopenfilename()
     
@@ -114,6 +148,7 @@ def upload_file():
 root = tk.Tk()
 root.geometry("800x600")
 root.title("Phishing Email Detector") # Title of GUI
+root.resizable(False, False)
 
 # Create the title label
 title_label = tk.Label(root, text="Phishing Email Detector", font=("system", 24, "bold"))
@@ -140,42 +175,38 @@ home_frame.grid_rowconfigure(0, weight=1)
 home_frame.grid_rowconfigure(7, weight=1)
 home_frame.grid_rowconfigure(8, weight=1)
 
-# Labels for the inputs
+# Labels and entries for the inputs
 sender_label = tk.Label(home_frame, text="Enter the Sender:", bg='navy', fg='white')
 sender_label.grid(row=1, column=1, padx=10, pady=5, sticky='e')
-
-sender_entry = tk.Entry(home_frame)
-sender_entry.grid(row=1, column=2, padx=10, pady=5, sticky='w', columnspan=3)
+sender_entry = tk.Entry(home_frame, width=45)
+sender_entry.grid(row=1, column=2, padx=10, pady=5, sticky='w')
 
 subject_label = tk.Label(home_frame, text="Enter the Subject:", bg='navy', fg='white')
 subject_label.grid(row=2, column=1, padx=10, pady=5, sticky='e')
-
-subject_entry = tk.Entry(home_frame)
+subject_entry = tk.Entry(home_frame, width=45)
 subject_entry.grid(row=2, column=2, padx=10, pady=5, sticky='w')
 
 content_label = tk.Label(home_frame, text="Enter the Content:", bg='navy', fg='white')
 content_label.grid(row=3, column=1, padx=10, pady=5, sticky='e')
-
-content_entry = tk.Entry(home_frame)
+content_entry = tk.Entry(home_frame, width=45)
 content_entry.grid(row=3, column=2, padx=10, pady=5, sticky='w')
 
 url_label = tk.Label(home_frame, text="Enter URL (optional):", bg='navy', fg='white')
 url_label.grid(row=4, column=1, padx=10, pady=10, sticky='e')
-
-url_entry = tk.Entry(home_frame)
+url_entry = tk.Entry(home_frame, width=45)
 url_entry.grid(row=4, column=2, padx=10, pady=10, sticky='w')
 
 hash_label = tk.Label(home_frame, text="Enter Hash (optional):", bg='navy', fg='white')
 hash_label.grid(row=5, column=1, padx=10, pady=5, sticky='e')
 
-hash_entry = tk.Entry(home_frame)
+hash_entry = tk.Entry(home_frame, width=45)
 hash_entry.grid(row=5, column=2, padx=10, pady=5, sticky='w')
 
 # File upload section
 upload_button = tk.Button(home_frame, text="Upload File to get Hash", command=upload_file)
 upload_button.grid(row=7, column=1, sticky='e')  # Positioned in the right column
 
-checkResults_button = tk.Button(home_frame, text="Check for Phishing", command=check_phishing)
+checkResults_button = tk.Button(home_frame, text="Check for Phishing", command=check_phishing, width=35)
 
 
 # Bind the URL entry to detect changes
@@ -205,8 +236,28 @@ to_home_button.grid(pady=10, padx=10)
 #=========================== Phishing Results Page Content ===========================
 # Phishing Results page
 phishingResult_frame = tk.Frame(content_frame, bg='navy', borderwidth=2, relief='solid')
+emailPositive_label = tk.Label(phishingResult_frame, bg='navy', fg='white', text="Based on our dataset, your email is likely to be: ")
+emailPositive_label.grid(row=1, column=1, padx=5, pady=5, sticky='w')
+
+urlPositive_label = tk.Label(phishingResult_frame, bg='navy', fg='white', text="Number of positive results for malicious URL: ")
+urlPositive_label.grid(row=2, column=1, padx=5, pady=5, sticky='w')
+urlPositive_button = tk.Button(phishingResult_frame, text="View malicious URL Flags", command=view_URL_positives)
+urlPositive_button.grid(row=2, column=2, padx=5, pady=5, sticky='w')
+
+hashPositive_label = tk.Label(phishingResult_frame, bg='navy', fg='white', text="Number of positive results for malicious Hash: ")
+hashPositive_label.grid(row=3, column=1, padx=5, pady=5, sticky='w')
+hashPositive_button = tk.Button(phishingResult_frame, text="View malicious Hash Flags", command=view_hash_positives)
+hashPositive_button.grid(row=3, column=2, padx=5, pady=5, sticky='w')
+
 to_home_button = tk.Button(phishingResult_frame, text="Back to Home Page", command=show_home)
-to_home_button.pack(pady=1)
+to_home_button.grid(row=0, column=0, pady=10, padx=10, sticky="nw")
+
+phishingResult_frame.grid_columnconfigure(0, weight=1)
+phishingResult_frame.grid_columnconfigure(1, weight=1)
+phishingResult_frame.grid_columnconfigure(3, weight=1)
+phishingResult_frame.grid_columnconfigure(4, weight=1)
+phishingResult_frame.grid_rowconfigure(0, weight=1)
+phishingResult_frame.grid_rowconfigure(4, weight=1)
 
 # Bind entry validation
 bind_entries()

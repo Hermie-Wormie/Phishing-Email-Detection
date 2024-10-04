@@ -27,7 +27,6 @@ df['combined_text'] = df['sender'] + ' ' + df['subject'] + ' ' + df['body']
 # Remove rows with missing values
 df = df.dropna(subset=['combined_text', 'label'])
 df = df[df['combined_text'].str.strip() != '']
-df = df[df['label'].str.strip() != '']
 
 # Step 2: Split the dataset into training and testing sets (80% train, 20% test)
 X_train, X_test, y_train, y_test = train_test_split(df['combined_text'], df['label'], test_size=0.2, random_state=42)

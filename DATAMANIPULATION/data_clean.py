@@ -37,7 +37,17 @@ def extract_data(words):
 
 
 # <---------------------------- Replacing text urls function --------------------------->
-def replace_urls(body):
+def find_url(text):
+    urls = re.findall(r'(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})', text)
+    return urls 
+
+def replace_url(text):
+    pass
+
+def replace_whitespaces(text):
+    pass
+
+def clean_text(body):
     """
     Finds urls in email body, 
     Replaces urls with empty string, 
@@ -162,7 +172,7 @@ def dataset_cleaning(dataset: list):
 
         try:
 
-            new_df = replace_urls(df.copy())
+            new_df = clean_text(df.copy())
             extract_data(new_df.copy())
 
             count += 1

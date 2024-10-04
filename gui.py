@@ -4,7 +4,7 @@ import re
 import webbrowser
 from VirusTotal import *
 from model_test import *
-from model import *
+from model_train import *
 
 #=========================== Functions ===========================
 

@@ -38,14 +38,23 @@ def extract_data(words):
 
 # <---------------------------- Replacing text urls function --------------------------->
 def find_url(text):
+    """
+    checks if url exists in text
+    """
     urls = re.findall(r'(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})', text)
     return urls 
 
 def replace_url(text):
-    pass
+    """
+    replaces url to empty string
+    """
+    return re.sub(r'(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})', '', text)
 
 def replace_whitespaces(text):
-    pass
+    """
+    removes blank spaces
+    """
+    return re.sub(r'[\r\n]+', ' ', text)
 
 def clean_text(body):
     """
@@ -60,14 +69,14 @@ def clean_text(body):
     try:
         for i in range(body.shape[0]):
 
-            urls = re.findall(r'(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})', body.loc[i,"body"])
+            urls = find_url(body.loc[i,"body"])
 
             if urls != []: 
 
                 urls = ','.join(urls)                
                 url_dict.update({i:urls})
-                body.loc[i,"body"] = re.sub(r'(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})', '', body.loc[i,"body"])
-                body.loc[i,"body"] = re.sub(r'[\r\n]+', ' ', body.loc[i,"body"])
+                body.loc[i,"body"] = replace_url(body.loc[i,"body"])
+                body.loc[i,"body"] = replace_whitespaces(body.loc[i,"body"])
             
             else: url_dict.update({i:''})
 

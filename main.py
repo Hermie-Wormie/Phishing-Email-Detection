@@ -40,7 +40,7 @@ def read_cleandata(cleandata_dir=Path("CLEANDATA"), ext="*.csv"):
 
 def main():
     
-    dataset_cleaning(extract_data())
+    pass
 
 if __name__ == "__main__":
     try:

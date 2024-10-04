@@ -170,10 +170,3 @@ def dataset_cleaning(dataset: list):
         except Exception as e:
             print(e)
 
-
-# <---------------------------- may and may not be used ---------------------------->
-def email_cleaning(email):
-    """idk """
-
-    df = read_csv(email)
-    print(df.columns)

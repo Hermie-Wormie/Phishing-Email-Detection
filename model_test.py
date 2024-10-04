@@ -20,9 +20,6 @@ def check_email(sender, subject, body):
     # Interpret the result
     result = "Phishing email" if prediction == 1 else "Non-phishing email"
     
-    # Print the prediction result
-    print(f"Predicted: {result}")
-    
     return result
 
 if __name__ == "__main__":
@@ -37,6 +34,8 @@ if __name__ == "__main__":
 
 """
 Test for non-phishing:
+
+Email: peterwon@gmail.com
 
 Subject: Team Meeting Reminder
 
@@ -54,13 +53,15 @@ James
 """
 Test for phishing:
 
+Email: peterwon@gmail.com
+
 Subject: Urgent: Update Your Account Information
 
 Body: Dear Valued Customer,
 
 We noticed unusual activity in your account. To ensure your security, we need you to verify your account information immediately. Click the link below to secure your account:
 
-[Update Your Account Now](https://fakebank.com/secure)
+[Update Your Account Now] http://www.myetherevvalliet.com/
 
 Failure to verify your information within 24 hours will result in account suspension.
 

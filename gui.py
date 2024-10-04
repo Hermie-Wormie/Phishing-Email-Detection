@@ -22,40 +22,49 @@ def show_phishingResult():
     home_frame.pack_forget()
     phishingResult_frame.pack(fill='both', expand=True)
 
-def validate_URL_input():
-    input_text = url_entry.get().strip()
-    if input_text == "":  
-        result_label.config(text="", fg='white')
-        return True  
+# def validate_URL_input():
+#     input_text = url_entry.get().strip()
+#     if input_text == "":  
+#         result_label.config(text="", fg='white')
+#         return True
     
-    # URL validation RegEx pattern, HTTP:// HTTPS:// is optional
-    url_pattern = re.compile(
-        r'^(?:https?://)?(?:www\.)'  
-        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  
-        r'localhost|'  
-        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|'  
-        r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  
-        r'(?:/\S*)?$',  
-        re.IGNORECASE)
+#     # URL validation RegEx pattern, HTTP:// HTTPS:// is optional
+#     url_pattern = re.compile(
+#         r'^(?:https?://)?(?:www\.)'  
+#         r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  
+#         r'localhost|'  
+#         r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|'  
+#         r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  
+#         r'(?:/\S*)?$',  
+#         re.IGNORECASE)
 
-    # Check if URL is valid
-    if url_pattern.match(input_text):
-        result_label.config(text="Valid URL", fg='green')
-        return True  
-    else:
-        result_label.config(text="Invalid URL", fg='red')
-        return False  
+#     # Check if URL is valid
+#     if url_pattern.match(input_text):
+#         result_label.config(text="Valid URL", fg='green')
+#         return True  
+#     else:
+#         result_label.config(text="Invalid URL", fg='red')
+#         return False  
+    
 
-def on_input_change(event):
-    checkResults_button.grid_forget()
-    validate_URL_input()
+# def on_input_change(event):
+#     checkResults_button.grid_forget()
+#     validate_URL_input()
+
+def extract_url(text):
+    # Regular expression to match URLs
+    url_pattern = r"https?://[^\s]+"
+    urls = re.findall(url_pattern, text)
+    
+    return urls if urls else None
 
 def check_phishing():
-    url = url_entry.get().strip()
+    # url = url_entry.get().strip()
     hash = hash_entry.get().strip()
     sender = sender_entry.get().strip()
     subject = subject_entry.get().strip()
     content = content_entry.get().strip()
+    url = extract_url(content)
     emailPositive = check_email(sender, subject, content)
     urlPositive = check_url(url)
     hashPositive = check_hash(hash)
@@ -70,6 +79,8 @@ def check_phishing():
         urlPositive_label.config(text="Number of positive results for malicious URL:           Clean URL")
     elif urlPositive == "URL not found in VirusTotal database":
         urlPositive_label.config(text="Number of positive results for malicious URL:           URL not found in VirusTotal")
+    elif urlPositive == "Error: 204 from VirusTotal":
+        urlPositive_label.config(text="Number of positive results for malicious URL:           Limit of 4 searches/min reached")
     else:
         urlPositive_label.config(text="Number of positive results for malicious URL:           No input provided")
 
@@ -80,12 +91,15 @@ def check_phishing():
         hashPositive_label.config(text="Number of positive results for malicious Hash:         Clean File")
     elif hashPositive == "Hash of file not found in VirusTotal database.":
         hashPositive_label.config(text="Number of positive results for malicious Hash:         File Hash not found in VirusTotal")
+    elif hashPositive == "Error: 204 from VirusTotal":
+        hashPositive_label.config(text="Number of positive results for malicious Hash:         Limit of 4 searches/min reached")   
     else:
         hashPositive_label.config(text="Number of positive results for malicious Hash:         No input provided")
     show_phishingResult()
 
 def view_URL_positives():
-    url = url_entry.get().strip()
+    content = content_entry.get().strip()
+    url = extract_url(content)
     urlPositive = (check_url(url))
     hyperlink = urlPositive[1]
     webbrowser.open(hyperlink)
@@ -105,36 +119,51 @@ def check_entries():
     email_pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 
     # Check if sender is a valid email
-    if not re.match(email_pattern, sender):
+    
+    if email_pattern != "" and subject !="" and content != "":
+        result_label.grid_forget()
+        checkResults_button.grid(row=7, column=2, pady=5, padx=15, sticky='w')
+        return
+    
+    elif not re.match(email_pattern, sender):
+        result_label.grid(row=7, column=2, pady=5, padx=9, sticky='nw', columnspan=2)
         result_label.config(text="Invalid sender email!", fg='red')
         checkResults_button.grid_forget()
         return
 
     # Check if subject and content are non-empty
-    if subject == "":
+    elif subject == "":
+        result_label.grid(row=7, column=2, pady=5, padx=9, sticky='nw', columnspan=2)
         result_label.config(text="Subject cannot be empty!", fg='red')
         checkResults_button.grid_forget()
         return
 
-    if content == "":
+    elif content == "":
+        result_label.grid(row=7, column=2, pady=5, padx=9, sticky='nw', columnspan=2)
         result_label.config(text="Content cannot be empty!", fg='red')
         checkResults_button.grid_forget()
         return
+        
+    # if email_pattern != "" and subject !="" and content != "":
+    #     result_label.grid_forget()
+    #     checkResults_button.grid(row=7, column=2, pady=5, padx=15, sticky='w')
+    #     return
+
 
     # Call URL validation and store the result
-    url_is_valid = validate_URL_input()
+    # url_is_valid = validate_URL_input()
 
     # Only show the check button if all fields are valid
-    if url_is_valid:
-        checkResults_button.grid(row=7, column=2, pady=5, padx=15, sticky='w')  # Show the check button
-    else:
-        checkResults_button.grid_forget()  # Hide the check button if URL is invalid
+    # if url_is_valid:
+    # checkResults_button.grid(row=7, column=2, pady=5, padx=15, sticky='w')  # Show the check button
+    # else:
+    #     checkResults_button.grid_forget()  # Hide the check button if URL is invalid
 
 def bind_entries():
     sender_entry.bind('<KeyRelease>', lambda event: check_entries())
     subject_entry.bind('<KeyRelease>', lambda event: check_entries())
     content_entry.bind('<KeyRelease>', lambda event: check_entries())
-    url_entry.bind('<KeyRelease>', lambda event: check_entries())
+    # url_entry.bind('<KeyRelease>', lambda event: check_entries())
 
 def upload_file():
     file_path = filedialog.askopenfilename()
@@ -191,10 +220,10 @@ content_label.grid(row=3, column=1, padx=10, pady=5, sticky='e')
 content_entry = tk.Entry(home_frame, width=45)
 content_entry.grid(row=3, column=2, padx=10, pady=5, sticky='w')
 
-url_label = tk.Label(home_frame, text="Enter URL (optional):", bg='navy', fg='white')
-url_label.grid(row=4, column=1, padx=10, pady=10, sticky='e')
-url_entry = tk.Entry(home_frame, width=45)
-url_entry.grid(row=4, column=2, padx=10, pady=10, sticky='w')
+# url_label = tk.Label(home_frame, text="Enter URL (optional):", bg='navy', fg='white')
+# url_label.grid(row=4, column=1, padx=10, pady=10, sticky='e')
+# url_entry = tk.Entry(home_frame, width=45)
+# url_entry.grid(row=4, column=2, padx=10, pady=10, sticky='w')
 
 hash_label = tk.Label(home_frame, text="Enter Hash (optional):", bg='navy', fg='white')
 hash_label.grid(row=5, column=1, padx=10, pady=5, sticky='e')
@@ -210,7 +239,7 @@ checkResults_button = tk.Button(home_frame, text="Check for Phishing", command=c
 
 
 # Bind the URL entry to detect changes
-url_entry.bind('<KeyRelease>', on_input_change)
+# url_entry.bind('<KeyRelease>', on_input_change)
 
 # Label to display validation results
 result_label = tk.Label(home_frame, text="", bg='navy', fg='white', anchor='w', width=20)

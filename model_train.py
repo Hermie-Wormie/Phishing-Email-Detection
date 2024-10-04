@@ -19,7 +19,7 @@ from DATAMANIPULATION.data_analysis import read_files
 from main import read_cleandata
 
 # Step 1: Load the cleaned dataset, selecting only the relevant columns
-df = read_files(read_cleandata)
+df = read_files(read_cleandata())
 
 # Combine 'sender', 'subject', and 'body' columns into a single text column
 df['combined_text'] = df['sender'] + ' ' + df['subject'] + ' ' + df['body']

@@ -3,17 +3,9 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
-
-# Import necessary libraries
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc, precision_recall_curve
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import confusion_matrix, roc_curve, auc, precision_recall_curve
 import numpy as np
 from DATAMANIPULATION.data_analysis import read_files
 from datapath import read_cleandata
@@ -43,23 +35,31 @@ log_reg_model.fit(X_train_tfidf, y_train)
 # Step 5: Make predictions on the test set
 y_pred = log_reg_model.predict(X_test_tfidf)
 
-# Step 6: Evaluate the model
-accuracy = accuracy_score(y_test, y_pred)
-precision = precision_score(y_test, y_pred)
-recall = recall_score(y_test, y_pred)
-f1 = f1_score(y_test, y_pred)
-
-#print(f"Accuracy: {accuracy:.4f}")
-#print(f"Precision: {precision:.4f}")
-#print(f"Recall: {recall:.4f}")
-#print(f"F1-Score: {f1:.4f}")
-
-# Optionally, print out a more detailed classification report
-#print("\nClassification Report:")
-#print(classification_report(y_test, y_pred))
-
 # -- Graphing Section Starts Here --
 # Define the plotting functions
+
+def classification_report():
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred)
+    recall = recall_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred)
+
+    metrics = [f1, recall, precision, accuracy]  # Accuracy last to be on top
+    metric_names = ['F1-Score', 'Recall', 'Precision', 'Accuracy']
+
+    plt.figure(figsize=(10, 6))
+    bars = plt.barh(metric_names, metrics, color=['blue', 'orange', 'green', 'red'])
+    plt.xlim(0, 1)  # Set x-axis limit from 0 to 1
+    plt.title('Model Evaluation Metrics')
+    plt.xlabel('Scores')
+    plt.grid(axis='x', linestyle='--', alpha=0.7)
+
+    # Add value labels to the center of the bars
+    for bar in bars:
+        plt.text(bar.get_width()/2, bar.get_y() + bar.get_height()/2, 
+                f'{bar.get_width():.4f}', ha='center', va='center', color='white', fontsize=12)
+
+    plt.show()
 
 def plot_confusion_matrix(y_test, y_pred):
     cm = confusion_matrix(y_test, y_pred)
@@ -89,37 +89,8 @@ def plot_precision_recall_curve(y_test, y_pred_proba):
     plt.legend(loc='lower left')
     plt.show()
 
-def plot_feature_importance(vectorizer, model):
-    feature_names = np.array(vectorizer.get_feature_names_out())
-    coef = model.coef_.flatten()
-    top_positive_indices = np.argsort(coef)[-20:]
-    top_negative_indices = np.argsort(coef)[:20]
-    
-    top_positive_features = feature_names[top_positive_indices]
-    top_negative_features = feature_names[top_negative_indices]
-    
-    top_positive_coefs = coef[top_positive_indices]
-    top_negative_coefs = coef[top_negative_indices]
-
-    plt.figure(figsize=(10, 5))
-    plt.barh(top_positive_features, top_positive_coefs, color='blue')
-    plt.title('Top 20 Positive Features (Indicating Phishing)')
-    plt.show()
-
-    plt.figure(figsize=(10, 5))
-    plt.barh(top_negative_features, top_negative_coefs, color='red')
-    plt.title('Top 20 Negative Features (Indicating Non-Phishing)')
-    plt.show()
-
 # Generate predictions with probabilities
 y_pred_proba = log_reg_model.predict_proba(X_test_tfidf)[:, 1]
-
-# Call the plotting functions
-#plot_confusion_matrix(y_test, y_pred)
-#plot_roc_curve(y_test, y_pred_proba)
-#plot_precision_recall_curve(y_test, y_pred_proba)
-#plot_feature_importance(tfidf_vectorizer, log_reg_model)
-
 
 """
 Phishing Detection:
@@ -143,8 +114,6 @@ What it means: The ROC curve shows the trade-off between the true positive rate 
 AUC (Area Under the Curve): AUC is a single value that summarizes the performance of the model. A value of 1.0 is perfect, and 0.5 is random guessing.
 3. Precision-Recall Curve
 What it means: The precision-recall curve shows the trade-off between precision and recall across thresholds. It's particularly useful for imbalanced datasets where the positive class (phishing) is less frequent.
-4. Feature Importance (for Logistic Regression)
-What it means: Logistic regression allows us to examine the importance (weights) of the features. This can show which words (from sender, subject, body) the model considers most relevant in predicting phishing emails.
 
 """
 
@@ -191,26 +160,6 @@ Example:
 A flat precision-recall curve means the model performs consistently across different thresholds, while a steep drop means the model may be sensitive to threshold changes (leading to poor performance on some thresholds).
 
 
-4. Feature Importance for Phishing (Top 20 Positive Features)
-What It Shows:
-This bar chart shows the top 20 words or phrases (features) that most strongly indicate an email is phishing, according to the model.
-Interpretation:
-Features with high positive coefficients are strongly correlated with phishing.
-Look for phishing-related keywords such as "password", "urgent", "click", "account", or specific suspicious domains.
-Example:
-If "account verification" or "reset password" appear as top positive features, this tells you that these terms are strong indicators of phishing emails in your dataset.
-
-
-5. Feature Importance for Non-Phishing (Top 20 Negative Features)
-What It Shows:
-This bar chart shows the top 20 words or phrases (features) that most strongly indicate an email is non-phishing.
-Interpretation:
-Features with high negative coefficients are strongly correlated with non-phishing emails.
-Common words used in business or personal communication that aren't typical of phishing schemes should appear here.
-Example:
-Words like "meeting", "schedule", "invoice", or names of trusted organizations could show up as top negative features, meaning they are common in legitimate emails.
-
-
 Summary:
 Confusion Matrix: Understand the raw performance of your model in terms of correctly or incorrectly classified emails.
 
@@ -218,9 +167,6 @@ ROC Curve: Measure the overall effectiveness of your model’s ability to differ
 
 Precision-Recall Curve: Evaluate your model’s balance between catching all phishing emails (recall) while minimizing false alarms (precision).
 
-Feature Importance (Positive): Discover the words most associated with phishing and understand why your model flags certain emails.
-
-Feature Importance (Negative): Understand the words that help the model distinguish non-phishing emails, giving you insights into what the model considers "safe."
 
 By analyzing these graphs, you can evaluate your model's strengths and weaknesses, identify areas for improvement, and better understand how it makes decisions.
 

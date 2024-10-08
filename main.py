@@ -13,7 +13,7 @@ def show_home():
     home_frame.pack(fill='both', expand=True)
 
 def show_model():
-    plot_confusion_matrix(y_test, y_pred)
+    classification_report()
 
 def show_phishingResult():
     home_frame.pack_forget()

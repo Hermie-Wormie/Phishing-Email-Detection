@@ -22,14 +22,6 @@ def check_email(sender, subject, body):
     
     return result
 
-if __name__ == "__main__":
-    # Get user input for sender, subject, and body
-    sender = input("Enter the email sender: ")
-    subject = input("Enter the email subject: ")
-    body = input("Enter the email body: ")
-    
-    # Call the function to check the email
-    check_email(sender, subject, body)
 
 
 """

@@ -1,5 +1,5 @@
 import re
-from pandas import read_csv, read_xml
+from pandas import read_csv
 from functools import reduce
 from nltk import word_tokenize, download, pos_tag
 
@@ -75,8 +75,7 @@ def clean_text(body):
 
                 urls = ','.join(urls)                
                 url_dict.update({i:urls})
-                body.loc[i,"body"] = replace_url(body.loc[i,"body"])
-                body.loc[i,"body"] = replace_whitespaces(body.loc[i,"body"])
+                body.loc[i,"body"] = reduce(lambda x, func: func(x), [replace_url,replace_whitespaces],body.loc[i,"body"])
             
             else: url_dict.update({i:''})
 

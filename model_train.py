@@ -16,7 +16,7 @@ import seaborn as sns
 from sklearn.metrics import confusion_matrix, roc_curve, auc, precision_recall_curve
 import numpy as np
 from DATAMANIPULATION.data_analysis import read_files
-from main import read_cleandata
+from datapath import read_cleandata
 
 # Step 1: Load the cleaned dataset, selecting only the relevant columns
 df = read_files(read_cleandata())

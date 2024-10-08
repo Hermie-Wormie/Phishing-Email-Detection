@@ -1,6 +1,5 @@
 import shutil
 from pathlib import Path
-from DATAMANIPULATION.data_clean import dataset_cleaning
 
 def extract_data():
     """
@@ -37,14 +36,3 @@ def read_cleandata(cleandata_dir=Path("CLEANDATA"), ext="*.csv"):
     datasets.extend(cleandata_dir.glob(ext))
 
     return datasets
-
-def main():
-    
-    pass
-
-if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("\nExiting programme ...")
-        exit()

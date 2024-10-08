@@ -1,5 +1,5 @@
 import re
-from pandas import read_csv
+from pandas import read_csv, DataFrame
 from functools import reduce
 from nltk import word_tokenize, download, pos_tag
 
@@ -15,14 +15,13 @@ download('omw-1.4', quiet=True)
 count = 0
 
 # <---------------------------- Writing into files function ---------------------------->
-def extract_data(words):
+def extract_data(words: DataFrame):
     """
     Fills all NA values with empty string, 
-    Before writing these into the cleandata files
+    Writes DataFrame into the cleandata files
     """
     try:
         words.fillna('', inplace = True)
-        words.drop_duplicates()
     except KeyError:
         print('KeyError')
     except Exception as e:
@@ -37,26 +36,26 @@ def extract_data(words):
 
 
 # <---------------------------- Replacing text urls function --------------------------->
-def find_url(text):
+def find_url(text: str):
     """
     checks if url exists in text
     """
     urls = re.findall(r'(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})', text)
     return urls 
 
-def replace_url(text):
+def replace_url(text: str):
     """
     replaces url to empty string
     """
     return re.sub(r'(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})', '', text)
 
-def replace_whitespaces(text):
+def replace_whitespaces(text: str):
     """
     removes blank spaces
     """
     return re.sub(r'[\r\n]+', ' ', text)
 
-def clean_text(body):
+def clean_text(body: DataFrame):
     """
     Finds urls in email body, 
     Replaces urls with empty string, 
@@ -92,7 +91,7 @@ def clean_text(body):
 
 
 # <-------------------------- Normalising text data functions -------------------------->
-def tokenize(input_text):
+def tokenize(input_text: str):
     """
     Convert a string of text to a list with words.
     """
@@ -102,7 +101,7 @@ def tokenize(input_text):
     
     return clean_list
 
-def remove_stopwords(tokenized_text):
+def remove_stopwords(tokenized_text: list):
     """
     Remove stopwords from a list of words.
     """
@@ -126,7 +125,7 @@ def get_wordnet_pos(treebank_tag):
     else:
         return None
 
-def lemmatize(token_list):
+def lemmatize(token_list: list):
     """
     Lemmatizes a list of tokens using WordNet lemmatizer.
     """
@@ -146,7 +145,7 @@ def join_list(lst: list):
     """
     return ' '.join(lst)
 
-def process_text(input_text):
+def process_text(input_text: str):
     """
     Conbines text normalisation functions into one higher order function
     """
@@ -156,7 +155,7 @@ def process_text(input_text):
 # <------------------------------ main cleaning function ------------------------------>
 def dataset_cleaning(dataset: list):
     """
-    Reads the datasets provided,
+    Reads the list of datasets provided,
     Remove any duplicates (?)
     Drops unused columns
     Calls functions to clean data

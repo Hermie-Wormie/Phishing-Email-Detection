@@ -15,7 +15,7 @@ download('omw-1.4', quiet=True)
 count = 0
 
 # <---------------------------- Writing into files function ---------------------------->
-def extract_data(words: DataFrame):
+def write_data(words: DataFrame):
     """
     Fills all NA values with empty string, 
     Writes DataFrame into the cleandata files
@@ -180,7 +180,7 @@ def dataset_cleaning(dataset: list):
         try:
 
             new_df = clean_text(df.copy())
-            extract_data(new_df.copy())
+            write_data(new_df.copy())
 
             count += 1
         

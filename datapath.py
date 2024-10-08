@@ -15,11 +15,7 @@ def extract_data():
 
     sep_data = read_cleandata(cleandata_dir, ext)
 
-    status = cleandata_dir.exists()
-    if status:
-        # print(f"Removing existing {cleandata_dir} ... ", end="")
-        shutil.rmtree(cleandata_dir)
-    # print(f"Making {cleandata_dir} ... ", end="")
+    if cleandata_dir.exists(): shutil.rmtree(cleandata_dir) #in case data gets corrupted
     cleandata_dir.mkdir()
     for path in sep_data:
         path.touch()
@@ -31,7 +27,6 @@ def read_cleandata(cleandata_dir=Path("CLEANDATA"), ext="*.csv"):
     Reads CLEANDATA dir
     Returns all child items in CLEANDATA
     """
-
     datasets: list[Path] = []
     datasets.extend(cleandata_dir.glob(ext))
 

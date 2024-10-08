@@ -1,6 +1,5 @@
 import hashlib
 import requests
-from email.parser import Parser
 
 API_KEY = 'c177ebfe27c37c0aec97609d333dcf803645c65fc855f44d5ffebfd8993ff700'
 VT_URL = 'https://www.virustotal.com/vtapi/v2/url/report'

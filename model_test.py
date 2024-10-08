@@ -53,7 +53,7 @@ James
 """
 Test for phishing:
 
-Email: peterwon@gmail.com
+Email: myetherevvalliet@gmail.com
 
 Subject: Urgent: Update Your Account Information
 
@@ -69,7 +69,7 @@ Thank you for your prompt attention to this matter.
 
 Sincerely,
 Customer Support Team
-Fake Bank Inc.
+MyEther Inc.
 
 
 """

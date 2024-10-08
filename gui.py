@@ -82,7 +82,7 @@ def check_phishing():
     elif urlPositive == "Error: 204 from VirusTotal":
         urlPositive_label.config(text="Number of positive results for malicious URL:           Limit of 4 searches/min reached")
     else:
-        urlPositive_label.config(text="Number of positive results for malicious URL:           No input provided")
+        urlPositive_label.config(text="Number of positive results for malicious URL:           No URL found in email")
 
     if isinstance(hashPositive, tuple):
         hashPositive_label.config(text=f"Number of positive results for malicious Hash:         {hashPositive[0]}")

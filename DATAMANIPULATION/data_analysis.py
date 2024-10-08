@@ -1,5 +1,3 @@
-'''work in progress'''
-
 from pandas import Series, to_datetime, read_csv, concat, DataFrame
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -9,6 +7,11 @@ from textblob import TextBlob
 from numpy import arange
 
 def label_distrbution(df):
+    """
+    This function visualizes the distribution of phishing vs legitimate emails
+    (0 for legitimate, 1 for phishing).
+    Plots a bar chart to show the count of phishing vs legitimate emails.
+    """
     try:
         df['label'].value_counts().plot(kind='bar', color=['skyblue', 'salmon'])
         plt.title('Distribution of Phishing vs Legitimate Emails')
@@ -20,6 +23,12 @@ def label_distrbution(df):
         print(e)
 
 def sender_domain(df):
+    """
+    This function analyzes and visualizes the top 12 sender domains for phishing and legitimate emails.
+    Extracts the domain from the 'sender' email addresses.
+    Creates a grouped bar plot to visualize counts of phishing and legitimate sender domains
+    Red for phishing, blue for legitimate
+    """
     try:
         df = df.dropna(subset=['sender'])
         df = df[df['sender'].str.strip() != '']
@@ -56,6 +65,11 @@ def sender_domain(df):
         print(e)
 
 def feature_frequency(df):
+    """
+    This function generates word clouds for the bodies of phishing and legitimate emails.
+    Concatenates the text of phishing and legitimate emails separately.
+    Creates two subplots showing word clouds for the most common words within the emails.
+    """
     try:
         df = df.dropna(subset=['body'])
         df = df[df['body'].str.strip() != '']
@@ -77,28 +91,13 @@ def feature_frequency(df):
     except Exception as e:
         print(e)
 
-# link analysis graph looks weird too
-
-# def link_analysis(df):
-#     try:
-#         df = df.dropna(subset=['url'])
-#         df = df[df['url'].str.strip() != '']
-#         df['link_count'] = df['url'].apply(lambda x: x.count('http'))
-#         plt.figure(figsize=(12, 6))
-
-#         plt.hist(df[df['label'] == 1]['link_count'], bins=30, alpha=0.6, label='Phishing', color='red')
-#         plt.hist(df[df['label'] == 0]['link_count'], bins=30, alpha=0.6, label='Legitimate', color='blue')
-#         plt.title('Distribution of Link Counts')
-#         plt.xlabel('Number of Links')
-#         plt.ylabel('Frequency')
-#         plt.legend()
-#         plt.ylim(0, df['link_count'].value_counts().max() + 5)
-#         plt.grid(axis='y', alpha=0.75)
-#         plt.show()
-#     except Exception as e:
-#         print(e)
-
 def time_count(df):
+    """
+    This function visualizes the frequency of emails sent by hour of the day for both phishing and legitimate emails.
+    Counts the number of emails sent during each hour for both categories.
+    Plots a line graph comparing the counts for phishing and legitimate emails over 24 hours.
+    Red for phishing, blue for legitimate
+    """
     try:
         df['date'] = to_datetime(df['date'], format='%a, %d %b %Y %H:%M:%S %z', errors='coerce', utc=True)
         df = df.dropna(subset=['date'])
@@ -128,6 +127,12 @@ def time_count(df):
 
 
 def sentiment_analysis(df):
+    """This function analyzes the sentiment of the email bodies
+    Uses SentimentIntensityAnalyzer to compute a sentiment score for each email body
+    The sentiment score (compound) ranges from -1 (very negative) to +1 (very positive)
+    In terms of tone, and emotional analysis
+    Creates a bar plot to display average sentiment scores for phishing and legitimate emails
+    """
     try:
         sia = SentimentIntensityAnalyzer()
         df = df.dropna(subset=['body'])
@@ -147,8 +152,14 @@ def analyze_sentiment(text):
     return blob.sentiment.polarity, blob.sentiment.subjectivity
 
 def visualise_sentiment2(df):
+    """This function provides a more detailed visualization of sentiment analysis
+    It applies the analyze_sentiment function to each email body, 
+    which uses TextBlob to calculate both 
+    polarity (how positive (+1) or negative (-1) the text is) and
+    subjectivity[0-1] (how subjective or objective the text is)
+    **Higher subjectivity means text contains personal opinion rather than factual information.
+    """
     try:
-        
         df = df.dropna(subset=['body'])
         df = df[df['body'].str.strip() != '']
         # Apply the function to the content column
@@ -176,4 +187,5 @@ def visualise_sentiment2(df):
         
 
 def read_files(dataset: list):
+    """Combines data from different files into one DataFrame"""
     return concat(map(read_csv, dataset ), ignore_index=True)

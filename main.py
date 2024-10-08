@@ -128,7 +128,7 @@ def upload_file():
     if file_path:
         hash = file_to_hash(file_path)
         hash_entry.delete(0, tk.END)  # Clear any existing text in the entry
-        hash_entry.insert(0, hash) # Add hashed file into input
+        hash_entry.insert(0, hash) # Add hashed into input
 
 # Main GUI application window
 root = tk.Tk()

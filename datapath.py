@@ -15,7 +15,7 @@ def extract_data():
 
     sep_data = read_cleandata(cleandata_dir, ext)
 
-    if cleandata_dir.exists(): shutil.rmtree(cleandata_dir) #in case data gets corrupted
+    if cleandata_dir.exists(): shutil.rmtree(cleandata_dir) #in case of corruption
     cleandata_dir.mkdir()
     for path in sep_data:
         path.touch()

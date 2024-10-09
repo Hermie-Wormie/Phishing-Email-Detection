@@ -191,7 +191,7 @@ checkResults_button = tk.Button(home_frame, text="Check for Phishing", command=c
 result_label = tk.Label(home_frame, text="", bg='navy', fg='white', anchor='w', width=20)
 result_label.grid(row=7, column=2, pady=5, padx=9, sticky='nw', columnspan=2)
 
-# Button to sview classification model
+# Button to view classification model
 to_model_button = tk.Button(home_frame, text="See classification Model", command=show_model)
 to_model_button.grid(row=10, column=1, columnspan=3, pady=5, sticky='s')
 

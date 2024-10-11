@@ -1,7 +1,7 @@
 import hashlib
 import requests
 
-API_KEY = 'c177ebfe27c37c0aec97609d333dcf803645c65fc855f44d5ffebfd8993ff700'
+API_KEY = 'Your_VT_API_Key'
 VT_URL = 'https://www.virustotal.com/vtapi/v2/url/report'
 VT_FILE = 'https://www.virustotal.com/vtapi/v2/file/report'
 
